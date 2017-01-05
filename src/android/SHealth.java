@@ -25,32 +25,14 @@ public class Hello extends CordovaPlugin {
             return true;
 
         } else if (action.equals("connect")) {
-
-            //stepCount = new StepCount(activity,callbackContext);
-            //stepCount.connect();
-            //stepCount.create();
-
+			
             callbackContext.success("connect");
 
             return true;
 
-        } else if (action.equals("getSteps")) {
-
-            //stepCount = new StepCount(activity,callbackContext);
-            //stepCount.connect();
-            //stepCount.create();
+        } else if (action.equals("getData")) {
 
             callbackContext.success("getSteps");
-
-            return true;
-
-        } else if (action.equals("footsteps")) {
-
-            stepCount = new StepCount(activity,callbackContext);
-            stepCount.connect();
-            stepCount.create();
-
-            //callbackContext.success(stepCount.toString());
 
             return true;
 

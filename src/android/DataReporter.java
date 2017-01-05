@@ -37,7 +37,7 @@ import android.app.Activity;
 
 import java.util.Calendar;
 
-public class StepCountReporter {
+public class DataReporter {
     private final HealthDataStore mStore;
 
     Activity activity;
@@ -45,7 +45,9 @@ public class StepCountReporter {
 
     String APP_TAG = "TAG_StepCount";
 
-    public StepCountReporter(HealthDataStore store, Activity pActivity, CallbackContext pCallbackContext) {
+    String resultString = "result: ";
+
+    public DataReporter(HealthDataStore store, Activity pActivity, CallbackContext pCallbackContext) {
         mStore = store;
         activity = pActivity;
         this.callbackContext = pCallbackContext;
@@ -54,8 +56,42 @@ public class StepCountReporter {
     public void start() {
         // Register an observer to listen changes of step count and get today step count
         HealthDataObserver.addObserver(mStore, HealthConstants.StepCount.HEALTH_DATA_TYPE, mObserver);
-        HealthDataObserver.addObserver(mStore, HealthConstants.HeartRate.HEALTH_DATA_TYPE, mObserver);
-        readTodayStepCount();
+        //HealthDataObserver.addObserver(mStore, HealthConstants.HeartRate.HEALTH_DATA_TYPE, mObserver);
+        HealthDataObserver.addObserver(mStore, HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, mObserver);
+        HealthDataObserver.addObserver(mStore, HealthConstants.WaterIntake.HEALTH_DATA_TYPE, mObserver);
+        HealthDataObserver.addObserver(mStore, HealthConstants.FoodIntake.HEALTH_DATA_TYPE, mObserver);
+
+        //readTodayStepCount();
+        //readTodayCaffeineIntake();
+
+        readToday(HealthConstants.StepCount.START_TIME, HealthConstants.StepCount.HEALTH_DATA_TYPE, HealthConstants.StepCount.COUNT, mListenerStepCount);
+        readToday(HealthConstants.CaffeineIntake.START_TIME, HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, HealthConstants.CaffeineIntake.AMOUNT, mListenerCaffeineIntake);
+        readToday(HealthConstants.WaterIntake.START_TIME, HealthConstants.WaterIntake.HEALTH_DATA_TYPE, HealthConstants.WaterIntake.AMOUNT, mListenerWaterIntake);
+        readToday(HealthConstants.FoodIntake.START_TIME, HealthConstants.FoodIntake.HEALTH_DATA_TYPE, HealthConstants.FoodIntake.AMOUNT, mListenerFoodIntake);
+    }
+
+    private void readToday(String hcStartTime, String hcHDT, String hcString, HealthResultHolder.ResultListener<ReadResult> pmListener) {
+        HealthDataResolver resolver = new HealthDataResolver(mStore, null);
+
+        // Set time range from start time of today to the current time
+        long startTime = getStartTimeOfToday();
+        long endTime = System.currentTimeMillis();
+        Filter filter = Filter.and(Filter.greaterThanEquals(hcStartTime, startTime),
+                Filter.lessThanEquals(hcStartTime, endTime));
+
+        HealthDataResolver.ReadRequest request = new ReadRequest.Builder()
+                .setDataType(hcHDT)
+                .setProperties(new String[] {hcString})
+                .setFilter(filter)
+                .build();
+
+
+        try {
+            resolver.read(request).setResultListener(pmListener);
+        } catch (Exception e) {
+            Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
+            Log.e(APP_TAG, "Getting step count fails.");
+        }
     }
 
     // Read the today's step count on demand
@@ -83,6 +119,30 @@ public class StepCountReporter {
         }
     }
 
+    private void readTodayCaffeineIntake() {
+        HealthDataResolver resolver = new HealthDataResolver(mStore, null);
+
+        // Set time range from start time of today to the current time
+        long startTime = getStartTimeOfToday();
+        long endTime = System.currentTimeMillis();
+        Filter filter = Filter.and(Filter.greaterThanEquals(HealthConstants.CaffeineIntake.START_TIME, startTime),
+                Filter.lessThanEquals(HealthConstants.CaffeineIntake.START_TIME, endTime));
+
+        HealthDataResolver.ReadRequest request = new ReadRequest.Builder()
+                .setDataType(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE)
+                .setProperties(new String[] {HealthConstants.CaffeineIntake.AMOUNT})
+                .setFilter(filter)
+                .build();
+
+
+        try {
+            resolver.read(request).setResultListener(mListener);
+        } catch (Exception e) {
+            Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
+            Log.e(APP_TAG, "Getting step count fails.");
+        }
+    }
+
     private long getStartTimeOfToday() {
         Calendar today = Calendar.getInstance();
 
@@ -97,6 +157,112 @@ public class StepCountReporter {
         return today.getTimeInMillis();
     }
 
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerStepCount = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            int count = 0;
+            Cursor c = null;
+
+            try {
+                c = result.getResultCursor();
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        count += c.getInt(c.getColumnIndex(HealthConstants.StepCount.COUNT));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "StepCountCOUNT;" + String.valueOf(count));
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerWaterIntake = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            int count = 0;
+            Cursor c = null;
+
+            try {
+                c = result.getResultCursor();
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        count += c.getInt(c.getColumnIndex(HealthConstants.WaterIntake.AMOUNT));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "WaterIntakeAMOUNT;" + String.valueOf(count));
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerFoodIntake = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            int count = 0;
+            Cursor c = null;
+
+            try {
+                c = result.getResultCursor();
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        count += c.getInt(c.getColumnIndex(HealthConstants.FoodIntake.AMOUNT));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "FoodIntakeAMOUNT;" + String.valueOf(count));
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerCaffeineIntake = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            int count = 0;
+            Cursor c = null;
+
+            try {
+                c = result.getResultCursor();
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        count += c.getInt(c.getColumnIndex(HealthConstants.CaffeineIntake.AMOUNT));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "CaffeineIntakeAMOUNT;" + String.valueOf(count));
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+
     private final HealthResultHolder.ResultListener<ReadResult> mListener = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -105,6 +271,7 @@ public class StepCountReporter {
 
             try {
                 c = result.getResultCursor();
+
                 if (c != null) {
                     while (c.moveToNext()) {
                         count += c.getInt(c.getColumnIndex(HealthConstants.StepCount.COUNT));
@@ -116,7 +283,11 @@ public class StepCountReporter {
                 }
             }
             //MainActivity.getInstance().drawStepCount(String.valueOf(count));
-            callbackContext.success("StepCount: " + String.valueOf(count));
+            //callbackContext.success(test + " _StepCount: " + String.valueOf(count));
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, "StepCountCOUNT;" + String.valueOf(count));
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
         }
     };
 

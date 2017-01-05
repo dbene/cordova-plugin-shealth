@@ -24,21 +24,21 @@ import java.util.Set;
 
 import android.app.Activity;
 
-public class StepCount {
+public class SHealthConnector {
 
     private final int MENU_ITEM_PERMISSION_SETTING = 1;
 
     private HealthDataStore mStore;
     private HealthConnectionErrorResult mConnError;
     private Set<PermissionKey> mKeySet;
-    private StepCountReporter mReporter;
+    private DataReporter mReporter;
 
     String APP_TAG = "TAG_StepCount";
 
     Activity activity;
     CallbackContext callbackContext;
 
-    public StepCount(Activity pActivity, CallbackContext pCallbackContext){
+    public SHealthConnector(Activity pActivity, CallbackContext pCallbackContext){
         this.activity = pActivity;
         this.callbackContext = pCallbackContext;
 
@@ -63,7 +63,8 @@ public class StepCount {
         mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.Sleep.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));
 
         HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
         try {
@@ -96,6 +97,7 @@ public class StepCount {
         try {
             healthDataService.initialize(activity.getApplicationContext());
         } catch (Exception e) {
+            Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
             e.printStackTrace();
         }
 
@@ -115,13 +117,14 @@ public class StepCount {
         public void onConnected() {
             Log.d(APP_TAG, "Health data service is connected.");
             HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
-            mReporter = new StepCountReporter(mStore, activity, callbackContext);
+            mReporter = new DataReporter(mStore, activity, callbackContext);
 
             try {
                 // Check whether the permissions that this application needs are acquired
                 Map<PermissionKey, Boolean> resultMap = pmsManager.isPermissionAcquired(mKeySet);
 
                 if (resultMap.containsValue(Boolean.FALSE)) {
+                    Log.e(APP_TAG, "try pmsManager.requestPermissions");
                     // Request the permission for reading step counts if it is not acquired
                     pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
                 } else {

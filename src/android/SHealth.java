@@ -5,18 +5,30 @@ import org.json.JSONArray;
 import org.json.JSONException;
 
 import android.app.Activity;
+import android.util.Log;
 
-public class Hello extends CordovaPlugin {
+public class SHealth extends CordovaPlugin {
 
-	Activity activity;
-    StepCount stepCount;
+    String APP_TAG = "TAG_StepCount";
+
+	Activity activity = null;
+    SHealthConnector connector = null;
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 
-        activity = this.cordova.getActivity();
+        if( activity == null) {
+            Log.e(APP_TAG, "activity == null");
+            activity = this.cordova.getActivity();
+        }
+
+        if( connector == null) {
+            Log.e(APP_TAG, "connector == null");
+            connector = new connector(activity, callbackContext);
+        }
 
         if (action.equals("greet")) {
+            Log.e(APP_TAG, "greet");
 
             String name = data.getString(0);
             String message = "Hello, " + name;
@@ -25,14 +37,16 @@ public class Hello extends CordovaPlugin {
             return true;
 
         } else if (action.equals("connect")) {
-			
-            callbackContext.success("connect");
+            Log.e(APP_TAG, "connect");
+
+            connector.connect();
 
             return true;
 
-        } else if (action.equals("getData")) {
+        } else if (action.equals("getSteps")) {
+            Log.e(APP_TAG, "getSteps");
 
-            callbackContext.success("getSteps");
+            connector.create();
 
             return true;
 

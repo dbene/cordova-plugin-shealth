@@ -8,7 +8,7 @@ import org.json.JSONException;
 import android.app.Activity;
 import android.util.Log;
 
-public class Hello extends CordovaPlugin {
+public class SHealth extends CordovaPlugin {
 
     String APP_TAG = "TAG_CordovaSHealth";
 

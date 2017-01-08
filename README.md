@@ -21,6 +21,21 @@ Edit `platforms/android/AndroidManifest.xml` and add the following code inside `
         
 ```
 
+Edit `www/js/index.js` and add the following code
+
+```js
+	var success = function(message) {					
+		var div = document.getElementById('greeting-content');
+		div.innerHTML = div.innerHTML + message + "<br>";
+	}
+
+	var failure = function() {
+		alert("Error calling Hello Plugin");
+	}
+
+	shealth.getSteps("1483455300000;1583455300000", success, failure);
+```
+
 Install Android platform
 
     cordova platform add android

@@ -1,4 +1,4 @@
-package com.example.plugin;
+package com.wopo.plugin;
 
 import com.samsung.android.sdk.healthdata.HealthConnectionErrorResult;
 import com.samsung.android.sdk.healthdata.HealthConstants;
@@ -10,7 +10,7 @@ import com.samsung.android.sdk.healthdata.HealthPermissionManager.PermissionResu
 import com.samsung.android.sdk.healthdata.HealthPermissionManager.PermissionType;
 import com.samsung.android.sdk.healthdata.HealthResultHolder;
 
-import com.samsung.android.simplehealth.StepCountReporter;
+import com.samsung.android.simplehealth.DataReporter;
 
 import android.util.Log;
 
@@ -33,7 +33,7 @@ public class SHealthConnector {
     private Set<PermissionKey> mKeySet;
     private DataReporter mReporter;
 
-    String APP_TAG = "TAG_StepCount";
+    String APP_TAG = "TAG_CordovaSHealth";
 
     Activity activity;
     CallbackContext callbackContext;
@@ -60,8 +60,9 @@ public class SHealthConnector {
     public void connect() {
 
         mKeySet = new HashSet<PermissionKey>();
-        mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
+
+        mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));

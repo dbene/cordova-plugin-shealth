@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
-        id="com.example.shealth"
+        id="com.wopo.shealth"
         version="0.7.0">
 
   <name>Shealth</name>
@@ -19,7 +19,7 @@
 
     <config-file target="res/xml/config.xml" parent="/*">
       <feature name="SHealth">
-        <param name="android-package" value="com.example.plugin.SHealth"/>
+        <param name="android-package" value="com.wopo.plugin.SHealth"/>
       </feature>
     </config-file>
 	<lib-file
@@ -28,9 +28,9 @@
 		arch="device"
 	/>
 
-    <source-file src="src/android/SHealth.java" target-dir="src/com/example/plugin/"/>
-    <source-file src="src/android/SHealthConnector.java" target-dir="src/com/example/plugin/"/>
-    <source-file src="src/android/DataReporter.java" target-dir="src/com/example/plugin/"/>
+    <source-file src="src/android/SHealth.java" target-dir="src/com/wopo/plugin/"/>
+    <source-file src="src/android/SHealthConnector.java" target-dir="src/com/wopo/plugin/"/>
+    <source-file src="src/android/DataReporter.java" target-dir="src/com/wopo/plugin/"/>
   </platform>
 
   <platform name="ios">

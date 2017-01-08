@@ -9,5 +9,8 @@ module.exports = {
     },
     getData: function (name, successCallback, errorCallback) {
         cordova.exec(successCallback, errorCallback, "SHealth", "getData", [name]);
+    },
+    footsteps: function (name, successCallback, errorCallback) {
+        cordova.exec(successCallback, errorCallback, "SHealth", "footsteps", [name]);
     }
 };

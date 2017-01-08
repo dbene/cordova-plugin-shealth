@@ -1,18 +1,19 @@
-package com.example.plugin;
+package com.wopo.plugin;
 
 import org.apache.cordova.*;
 import org.json.JSONArray;
+import org.json.JSONObject;
 import org.json.JSONException;
 
 import android.app.Activity;
 import android.util.Log;
 
-public class SHealth extends CordovaPlugin {
+public class Hello extends CordovaPlugin {
 
-    String APP_TAG = "TAG_StepCount";
+    String APP_TAG = "TAG_CordovaSHealth";
 
 	Activity activity = null;
-    SHealthConnector connector = null;
+    SHealthConnector stepCount = null;
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -22,9 +23,9 @@ public class SHealth extends CordovaPlugin {
             activity = this.cordova.getActivity();
         }
 
-        if( connector == null) {
-            Log.e(APP_TAG, "connector == null");
-            connector = new connector(activity, callbackContext);
+        if( stepCount == null) {
+            Log.e(APP_TAG, "stepCount == null");
+            stepCount = new SHealthConnector(activity, callbackContext);
         }
 
         if (action.equals("greet")) {
@@ -39,14 +40,34 @@ public class SHealth extends CordovaPlugin {
         } else if (action.equals("connect")) {
             Log.e(APP_TAG, "connect");
 
-            connector.connect();
+            String string = data.getString(0);
+
+            String[] parts = string.split(";");
+
+            long startTime = Long.parseLong(parts[0]);
+            long endTime = Long.parseLong(parts[1]);
+
+            Log.e(APP_TAG, startTime + " - " + endTime);
+
+            stepCount.connect();
 
             return true;
 
-        } else if (action.equals("getSteps")) {
-            Log.e(APP_TAG, "getSteps");
+        } else if (action.equals("getData")) {
+            Log.e(APP_TAG, "getData");
 
-            connector.create();
+            stepCount.create();
+
+            return true;
+
+        } else if (action.equals("footsteps")) {
+            Log.e(APP_TAG, "footsteps");
+
+            //stepCount = new StepCount(activity,callbackContext);
+            stepCount.connect();
+            stepCount.create();
+
+            //callbackContext.success(stepCount.toString());
 
             return true;
 

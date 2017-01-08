@@ -2,6 +2,11 @@
 
 SHealth Plugin
 
+#bugs ( maybe not up to date)
+- filter by given timestamp (in milliseconds) not working
+- Samsung SHealth permission windows showing up to often
+
+
 ## Using
 
 Create a new Cordova Project
@@ -33,7 +38,7 @@ Edit `www/js/index.js` and add the following code
 		alert("Error calling Hello Plugin");
 	}
 
-	shealth.getSteps("1483455300000;1583455300000", success, failure);
+	shealth.getData("1483455300000;1583455300000", success, failure);
 ```
 
 Install Android platform

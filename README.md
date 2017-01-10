@@ -4,7 +4,6 @@ SHealth Plugin
 
 #bugs ( maybe not up to date)
 - filter by given timestamp (in milliseconds) not working
-- Samsung SHealth permission windows showing up to often
 
 
 ## Using

@@ -43,7 +43,7 @@ public class DataReporter {
     Activity activity;
     CallbackContext callbackContext;
 
-    String APP_TAG = "TAG_CordovaSHealth";
+    String APP_TAG = "CordovaSHealthPlugin";
 
     String resultString = "result: ";
 

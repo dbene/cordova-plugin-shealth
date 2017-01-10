@@ -33,7 +33,7 @@ public class SHealthConnector {
     private Set<PermissionKey> mKeySet;
     private DataReporter mReporter;
 
-    String APP_TAG = "TAG_CordovaSHealth";
+    String APP_TAG = "CordovaSHealthPlugin";
 
     Activity activity;
     CallbackContext callbackContext;
@@ -52,7 +52,7 @@ public class SHealthConnector {
 
     }
 
-    public void connect() {
+    public void callHealthPermissionManager() {
         HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
         try {
             // Show user permission UI for allowing user to change options
@@ -63,7 +63,7 @@ public class SHealthConnector {
         }
     }
 
-    public void create() {
+    public void getData(long startTime, long endTime) {
         HealthDataService healthDataService = new HealthDataService();
         try {
             healthDataService.initialize(activity.getApplicationContext());

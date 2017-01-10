@@ -10,7 +10,7 @@ import android.util.Log;
 
 public class SHealth extends CordovaPlugin {
 
-    String APP_TAG = "TAG_CordovaSHealth";
+    String APP_TAG = "CordovaSHealthPlugin";
 
 	Activity activity = null;
     SHealthConnector stepCount = null;
@@ -29,45 +29,34 @@ public class SHealth extends CordovaPlugin {
         }
 
         if (action.equals("greet")) {
-            Log.e(APP_TAG, "greet");
 
             String name = data.getString(0);
-            String message = "Hello, " + name;
-            callbackContext.success(message);
 
+            Log.e(APP_TAG, "Hello, " + name + " this is a cordova shealth plugin!");
+            String message = "Hello, " + name + " this is a cordova shealth plugin!";
+
+            callbackContext.success(message);
             return true;
 
-        } else if (action.equals("connect")) {
-            Log.e(APP_TAG, "connect");
+        } else if (action.equals("callHealthPermissionManager")) {
+            Log.e(APP_TAG, "callHealthPermissionManager");
 
-            String string = data.getString(0);
-
-            String[] parts = string.split(";");
-
-            long startTime = Long.parseLong(parts[0]);
-            long endTime = Long.parseLong(parts[1]);
-
-            Log.e(APP_TAG, startTime + " - " + endTime);
-
-            stepCount.connect();
+            stepCount.callHealthPermissionManager();
 
             return true;
 
         } else if (action.equals("getData")) {
             Log.e(APP_TAG, "getData");
 
-            stepCount.create();
+            String string = data.getString(0);
+            String[] parts = string.split(";");
 
-            return true;
+            long startTime = Long.parseLong(parts[0]);
+            long endTime = Long.parseLong(parts[1]);
 
-        } else if (action.equals("footsteps")) {
-            Log.e(APP_TAG, "footsteps");
+            Log.e(APP_TAG, "StartTime: " + startTime + " - EndTime: " + endTime);
 
-            //stepCount = new StepCount(activity,callbackContext);
-            stepCount.connect();
-            stepCount.create();
-
-            //callbackContext.success(stepCount.toString());
+            stepCount.getData(startTime, endTime);
 
             return true;
 

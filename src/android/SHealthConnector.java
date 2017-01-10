@@ -42,23 +42,6 @@ public class SHealthConnector {
         this.activity = pActivity;
         this.callbackContext = pCallbackContext;
 
-        /*
-
-        HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
-        try {
-            // Show user permission UI for allowing user to change options
-            pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
-        } catch (Exception e) {
-            Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
-            Log.e(APP_TAG, "Permission setting fails.");
-        }
-
-        */
-
-    }
-
-    public void connect() {
-
         mKeySet = new HashSet<PermissionKey>();
         mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
 
@@ -67,6 +50,9 @@ public class SHealthConnector {
         mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));
 
+    }
+
+    public void connect() {
         HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
         try {
             // Show user permission UI for allowing user to change options
@@ -78,22 +64,6 @@ public class SHealthConnector {
     }
 
     public void create() {
-        /*
-        mKeySet = new HashSet<PermissionKey>();
-        mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.Sleep.HEALTH_DATA_TYPE, PermissionType.READ));
-
-        HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
-        try {
-            // Show user permission UI for allowing user to change options
-            pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
-        } catch (Exception e) {
-            Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
-            Log.e(APP_TAG, "Permission setting fails.");
-        }
-        */
         HealthDataService healthDataService = new HealthDataService();
         try {
             healthDataService.initialize(activity.getApplicationContext());

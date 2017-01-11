@@ -25,7 +25,7 @@ Edit `platforms/android/AndroidManifest.xml` and add the following code inside `
         
 ```
 
-Edit `www/js/index.js` and add the following code
+Example of an api call in your `www/js/index.js`
 
 ```js
 	var success = function(message) {					

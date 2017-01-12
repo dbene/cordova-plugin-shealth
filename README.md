@@ -28,7 +28,7 @@ Edit `platforms/android/AndroidManifest.xml` and add the following code inside `
 Example of an api call in your `www/js/index.js`
 
 ```js
-	var success = function(message) {					
+	var success = function(message) {
 		var div = document.getElementById('greeting-content');
 		div.innerHTML = div.innerHTML + message + "<br>";
 	}
@@ -36,8 +36,22 @@ Example of an api call in your `www/js/index.js`
 	var failure = function() {
 		alert("Error calling Hello Plugin");
 	}
-
-	shealth.getData("1483455300000;1583455300000", success, failure);
+		
+	function greet() {
+		shealth.greet("World", success, failure);
+	}
+	
+	function apiConnect() {
+		shealth.connectToSHealth("", success, failure);
+	}
+	
+	function apiPermissions() {
+		shealth.callHealthPermissionManager("", success, failure);
+	}
+	
+	function apiGetData() {
+		shealth.getDataFromSHealth("1483455300000;1583455300000", success, failure);
+	}
 ```
 
 Install Android platform

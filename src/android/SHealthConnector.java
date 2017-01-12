@@ -44,12 +44,37 @@ public class SHealthConnector {
 
         mKeySet = new HashSet<PermissionKey>();
         mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
-
         mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.Sleep.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.BodyTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
 
+        HealthDataService healthDataService = new HealthDataService();
+        try {
+            healthDataService.initialize(activity.getApplicationContext());
+        } catch (Exception e) {
+            Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    public void connect() {
+        /*
+        HealthDataService healthDataService = new HealthDataService();
+        try {
+            healthDataService.initialize(activity.getApplicationContext());
+        } catch (Exception e) {
+            Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
+            e.printStackTrace();
+        }
+        */
+
+        // Create a HealthDataStore instance and set its listener
+        mStore = new HealthDataStore(activity.getApplicationContext(), mConnectionListener);
+        // Request the connection to the health data store
+        mStore.connectService();
     }
 
     public void callHealthPermissionManager() {
@@ -63,19 +88,12 @@ public class SHealthConnector {
         }
     }
 
-    public void getData(long startTime, long endTime) {
-        HealthDataService healthDataService = new HealthDataService();
-        try {
-            healthDataService.initialize(activity.getApplicationContext());
-        } catch (Exception e) {
-            Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
-            e.printStackTrace();
+    public void startReporter(long startTime, long endTime) {
+        if(mReporter != null){
+            mReporter.start(startTime,endTime);
+        } else {
+            Log.e(APP_TAG, "mReporter == null");
         }
-
-        // Create a HealthDataStore instance and set its listener
-        mStore = new HealthDataStore(activity.getApplicationContext(), mConnectionListener);
-        // Request the connection to the health data store
-        mStore.connectService();
     }
 
     public void disconnectService() {
@@ -100,7 +118,7 @@ public class SHealthConnector {
                     pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
                 } else {
                     // Get the current step count and display it
-                    mReporter.start();
+                    //mReporter.start();
                 }
             } catch (Exception e) {
                 Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
@@ -133,7 +151,7 @@ public class SHealthConnector {
                         //showPermissionAlarmDialog();
                     } else {
                         // Get the current step count and display it
-                        mReporter.start();
+                        //mReporter.start();
                     }
                 }
             };

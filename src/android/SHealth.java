@@ -12,8 +12,8 @@ public class SHealth extends CordovaPlugin {
 
     String APP_TAG = "CordovaSHealthPlugin";
 
-	Activity activity = null;
-    SHealthConnector stepCount = null;
+    Activity activity = null;
+    SHealthConnector connector = null;
 
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
@@ -23,9 +23,9 @@ public class SHealth extends CordovaPlugin {
             activity = this.cordova.getActivity();
         }
 
-        if( stepCount == null) {
-            Log.e(APP_TAG, "stepCount == null");
-            stepCount = new SHealthConnector(activity, callbackContext);
+        if( connector == null) {
+            Log.e(APP_TAG, "connector == null");
+            connector = new SHealthConnector(activity, callbackContext);
         }
 
         if (action.equals("greet")) {
@@ -35,18 +35,28 @@ public class SHealth extends CordovaPlugin {
             Log.e(APP_TAG, "Hello, " + name + " this is a cordova shealth plugin!");
             String message = "Hello, " + name + " this is a cordova shealth plugin!";
 
-            callbackContext.success(message);
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, message);
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+
+            return true;
+
+        } else if (action.equals("connectToSHealth")) {
+            Log.e(APP_TAG, "connectToSHealth");
+
+            connector.connect();
+
             return true;
 
         } else if (action.equals("callHealthPermissionManager")) {
             Log.e(APP_TAG, "callHealthPermissionManager");
 
-            stepCount.callHealthPermissionManager();
+            connector.callHealthPermissionManager();
 
             return true;
 
-        } else if (action.equals("getData")) {
-            Log.e(APP_TAG, "getData");
+        } else if (action.equals("getDataFromSHealth")) {
+            Log.e(APP_TAG, "getDataFromSHealth");
 
             String string = data.getString(0);
             String[] parts = string.split(";");
@@ -56,12 +66,12 @@ public class SHealth extends CordovaPlugin {
 
             Log.e(APP_TAG, "StartTime: " + startTime + " - EndTime: " + endTime);
 
-            stepCount.getData(startTime, endTime);
+            connector.startReporter(startTime, endTime);
 
             return true;
 
         } else {
-            
+
             return false;
 
         }

@@ -53,42 +53,114 @@ public class DataReporter {
         this.callbackContext = pCallbackContext;
     }
 
-    public void start() {
+    public void start(long pStartTime, long pEndTime) {
         // Register an observer to listen changes of step count and get today step count
         // HealthDataObserver.addObserver(mStore, HealthConstants.StepCount.HEALTH_DATA_TYPE, mObserver);
 
+        Log.d(APP_TAG,"Time: " + pStartTime + " - " + pEndTime);
+
+        long startTime = getStartTimeOfToday();
+        long endTime = System.currentTimeMillis();
+
         readToday(
-                getStartTimeOfToday(),
-                System.currentTimeMillis(),
+                startTime,
+                endTime,
                 HealthConstants.StepCount.START_TIME,
-                HealthConstants.StepCount.HEALTH_DATA_TYPE, new String[] {
+                HealthConstants.StepCount.HEALTH_DATA_TYPE,
+                new String[] {
                         HealthConstants.StepCount.COUNT,
                         HealthConstants.StepCount.START_TIME,
-                        HealthConstants.StepCount.END_TIME
+                        HealthConstants.StepCount.END_TIME,
+                        HealthConstants.StepCount.TIME_OFFSET
                 },
                 mListenerStepCount
         );
 
         readToday(
-                getStartTimeOfToday(),
-                System.currentTimeMillis(),
+                startTime,
+                endTime,
                 HealthConstants.WaterIntake.START_TIME,
-                HealthConstants.WaterIntake.HEALTH_DATA_TYPE, new String[] {
+                HealthConstants.WaterIntake.HEALTH_DATA_TYPE,
+                new String[] {
                         HealthConstants.WaterIntake.AMOUNT,
-                        HealthConstants.WaterIntake.START_TIME
+                        HealthConstants.WaterIntake.START_TIME,
+                        HealthConstants.WaterIntake.TIME_OFFSET
                 },
                 mListenerWaterIntake
         );
 
         readToday(
-                getStartTimeOfToday(),
-                System.currentTimeMillis(),
+                startTime,
+                endTime,
                 HealthConstants.CaffeineIntake.START_TIME,
-                HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, new String[] {
+                HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE,
+                new String[] {
                         HealthConstants.CaffeineIntake.AMOUNT,
-                        HealthConstants.CaffeineIntake.START_TIME
+                        HealthConstants.CaffeineIntake.START_TIME,
+                        HealthConstants.CaffeineIntake.TIME_OFFSET
                 },
                 mListenerCaffeineIntake
+        );
+
+        // Todo
+
+        readToday(
+                startTime,
+                endTime,
+                HealthConstants.Sleep.START_TIME,
+                HealthConstants.Sleep.HEALTH_DATA_TYPE,
+                new String[] {
+                        HealthConstants.Sleep.START_TIME,
+                        HealthConstants.Sleep.END_TIME,
+                        HealthConstants.Sleep.TIME_OFFSET
+                },
+                mListenerSleep
+        );
+
+        readToday(
+                startTime,
+                endTime,
+                HealthConstants.HeartRate.START_TIME,
+                HealthConstants.HeartRate.HEALTH_DATA_TYPE,
+                new String[] {
+                        HealthConstants.HeartRate.HEART_RATE,
+                        HealthConstants.HeartRate.HEART_BEAT_COUNT,
+                        HealthConstants.HeartRate.START_TIME,
+                        HealthConstants.HeartRate.END_TIME,
+                        HealthConstants.HeartRate.TIME_OFFSET
+                },
+                mListenerHeartRate
+        );
+
+        readToday(
+                startTime,
+                endTime,
+                HealthConstants.AmbientTemperature.START_TIME,
+                HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE,
+                new String[] {
+                        HealthConstants.AmbientTemperature.TEMPERATURE,
+                        HealthConstants.AmbientTemperature.LATITUDE,
+                        HealthConstants.AmbientTemperature.LONGITUDE,
+                        HealthConstants.AmbientTemperature.ALTITUDE,
+                        HealthConstants.AmbientTemperature.ACCURACY,
+                        HealthConstants.AmbientTemperature.START_TIME,
+                        HealthConstants.AmbientTemperature.TIME_OFFSET
+                },
+                mListenerAmbientTemperature
+        );
+
+        readToday(
+                startTime,
+                endTime,
+                HealthConstants.BodyTemperature.START_TIME,
+                HealthConstants.BodyTemperature.HEALTH_DATA_TYPE,
+                new String[] {
+                        HealthConstants.BodyTemperature.TEMPERATURE,
+                        HealthConstants.BodyTemperature.START_TIME,
+                        HealthConstants.BodyTemperature.TIME_OFFSET
+                },
+                mListenerBodyTemperature
+
         );
     }
 
@@ -120,7 +192,7 @@ public class DataReporter {
         today.set(Calendar.MILLISECOND, 0);
 
         // Letzer Monat
-        today.add(Calendar.DAY_OF_MONTH, -5);
+        today.add(Calendar.DAY_OF_MONTH, -8);
 
         return today.getTimeInMillis();
     }
@@ -134,11 +206,12 @@ public class DataReporter {
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;COUNT;START_TIME;END_TIME");
+                sb.append("NAME;COUNT;START_TIME;END_TIME;TIME_OFFSET");
                 sb.append(System.getProperty("line.separator"));
 
                 if (c != null) {
                     while (c.moveToNext()) {
+
                         sb.append("StepCount");
                         sb.append(";");
                         sb.append(String.valueOf(c.getInt(c.getColumnIndex(HealthConstants.StepCount.COUNT))));
@@ -146,6 +219,8 @@ public class DataReporter {
                         sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.StepCount.START_TIME))));
                         sb.append(";");
                         sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.StepCount.END_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.StepCount.TIME_OFFSET))));
                         sb.append(System.getProperty("line.separator"));
                     }
                 }
@@ -172,7 +247,7 @@ public class DataReporter {
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;AMOUNT;START_TIME");
+                sb.append("NAME;AMOUNT;START_TIME;TIME_OFFSET");
                 sb.append(System.getProperty("line.separator"));
 
                 if (c != null) {
@@ -182,6 +257,8 @@ public class DataReporter {
                         sb.append(String.valueOf(c.getInt(c.getColumnIndex(HealthConstants.WaterIntake.AMOUNT))));
                         sb.append(";");
                         sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.WaterIntake.START_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.WaterIntake.TIME_OFFSET))));
                         sb.append(System.getProperty("line.separator"));
                     }
                 }
@@ -208,7 +285,7 @@ public class DataReporter {
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;AMOUNT;START_TIME");
+                sb.append("NAME;AMOUNT;START_TIME;TIME_OFFSET");
                 sb.append(System.getProperty("line.separator"));
 
                 if (c != null) {
@@ -218,6 +295,8 @@ public class DataReporter {
                         sb.append(String.valueOf(c.getInt(c.getColumnIndex(HealthConstants.CaffeineIntake.AMOUNT))));
                         sb.append(";");
                         sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.CaffeineIntake.START_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.CaffeineIntake.TIME_OFFSET))));
                         sb.append(System.getProperty("line.separator"));
                     }
                 }
@@ -234,6 +313,172 @@ public class DataReporter {
             callbackContext.sendPluginResult(pluginResult);
         }
     };
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerSleep = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            Cursor c = null;
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                c = result.getResultCursor();
+
+                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET");
+                sb.append(System.getProperty("line.separator"));
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        sb.append("Sleep");
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.Sleep.START_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.Sleep.END_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.Sleep.TIME_OFFSET))));
+                        sb.append(System.getProperty("line.separator"));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            Log.d(APP_TAG,sb.toString());
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerHeartRate = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            Cursor c = null;
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                c = result.getResultCursor();
+
+                sb.append("NAME;HEART_RATE;HEART_BEAT_COUNT;START_TIME;END_TIME;TIME_OFFSET");
+                sb.append(System.getProperty("line.separator"));
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        sb.append("HeartRate");
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getInt(c.getColumnIndex(HealthConstants.HeartRate.HEART_RATE))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.HeartRate.HEART_BEAT_COUNT))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.HeartRate.START_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.HeartRate.END_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.HeartRate.TIME_OFFSET))));
+                        sb.append(System.getProperty("line.separator"));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            Log.d(APP_TAG,sb.toString());
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerBodyTemperature = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            Cursor c = null;
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                c = result.getResultCursor();
+
+                sb.append("NAME;TEMPERATURE;START_TIME;TIME_OFFSET");
+                sb.append(System.getProperty("line.separator"));
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        sb.append("BodyTemperature");
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getInt(c.getColumnIndex(HealthConstants.BodyTemperature.TEMPERATURE))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.BodyTemperature.START_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.BodyTemperature.TIME_OFFSET))));
+                        sb.append(System.getProperty("line.separator"));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            Log.d(APP_TAG,sb.toString());
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+    private final HealthResultHolder.ResultListener<ReadResult> mListenerAmbientTemperature = new HealthResultHolder.ResultListener<ReadResult>() {
+        @Override
+        public void onResult(ReadResult result) {
+            Cursor c = null;
+            StringBuilder sb = new StringBuilder();
+
+            try {
+                c = result.getResultCursor();
+
+                sb.append("NAME;TEMPERATURE;LATITUDE;LONGITUDE;ALTITUDE;ACCURACY;START_TIME;TIME_OFFSET");
+                sb.append(System.getProperty("line.separator"));
+
+                if (c != null) {
+                    while (c.moveToNext()) {
+                        sb.append("AmbientTemperature");
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getInt(c.getColumnIndex(HealthConstants.AmbientTemperature.TEMPERATURE))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.LATITUDE))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.LONGITUDE))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.ALTITUDE))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.ACCURACY))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.START_TIME))));
+                        sb.append(";");
+                        sb.append(String.valueOf(c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.TIME_OFFSET))));
+                        sb.append(System.getProperty("line.separator"));
+                    }
+                }
+            } finally {
+                if (c != null) {
+                    c.close();
+                }
+            }
+
+            Log.d(APP_TAG,sb.toString());
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
+        }
+    };
+
+
 
     /*
     private final HealthDataObserver mObserver = new HealthDataObserver(null) {

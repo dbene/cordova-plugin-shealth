@@ -29,12 +29,11 @@ Example of an api call in your `www/js/index.js`
 
 ```js
 	var success = function(message) {
-		var div = document.getElementById('greeting-content');
-		div.innerHTML = div.innerHTML + message + "<br>";
+		alert(message);
 	}
 
-	var failure = function() {
-		alert("Error calling Hello Plugin");
+	var failure = function(message) {
+		alert("ERROR: " + message);
 	}
 		
 	function greet() {

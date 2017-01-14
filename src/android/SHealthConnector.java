@@ -43,33 +43,39 @@ public class SHealthConnector {
         this.callbackContext = pCallbackContext;
 
         mKeySet = new HashSet<PermissionKey>();
-        mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.Exercise.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.Sleep.HEALTH_DATA_TYPE, PermissionType.READ));
+        //mKeySet.add(new PermissionKey(HealthConstants.SleepStage.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.FoodInfo.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.Weight.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BodyTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
-
-        HealthDataService healthDataService = new HealthDataService();
-        try {
-            healthDataService.initialize(activity.getApplicationContext());
-        } catch (Exception e) {
-            Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
-            e.printStackTrace();
-        }
+        mKeySet.add(new PermissionKey(HealthConstants.BloodPressure.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.BloodGlucose.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.OxygenSaturation.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.HbA1c.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.Electrocardiogram.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.UvExposure.HEALTH_DATA_TYPE, PermissionType.READ));
     }
 
     public void connect() {
-        /*
+
         HealthDataService healthDataService = new HealthDataService();
         try {
             healthDataService.initialize(activity.getApplicationContext());
         } catch (Exception e) {
             Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
             e.printStackTrace();
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Could not connect with SHealth");
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
         }
-        */
 
         // Create a HealthDataStore instance and set its listener
         mStore = new HealthDataStore(activity.getApplicationContext(), mConnectionListener);
@@ -85,6 +91,10 @@ public class SHealthConnector {
         } catch (Exception e) {
             Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
             Log.e(APP_TAG, "Permission setting fails.");
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Permission setting failed");
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
         }
     }
 
@@ -93,6 +103,10 @@ public class SHealthConnector {
             mReporter.start(startTime,endTime);
         } else {
             Log.e(APP_TAG, "mReporter == null");
+
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Not connected with SHealth");
+            pluginResult.setKeepCallback(true);
+            callbackContext.sendPluginResult(pluginResult);
         }
     }
 
@@ -118,7 +132,7 @@ public class SHealthConnector {
                     pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
                 } else {
                     // Get the current step count and display it
-                    //mReporter.start();
+                    // mReporter.start();
                 }
             } catch (Exception e) {
                 Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
@@ -151,7 +165,7 @@ public class SHealthConnector {
                         //showPermissionAlarmDialog();
                     } else {
                         // Get the current step count and display it
-                        //mReporter.start();
+                        // mReporter.start();
                     }
                 }
             };

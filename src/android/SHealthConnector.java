@@ -46,19 +46,19 @@ public class SHealthConnector {
         mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.Exercise.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.Sleep.HEALTH_DATA_TYPE, PermissionType.READ));
-        //mKeySet.add(new PermissionKey(HealthConstants.SleepStage.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.FoodInfo.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.SleepStage.HEALTH_DATA_TYPE, PermissionType.READ)); // Not in Manifest
+        //mKeySet.add(new PermissionKey(HealthConstants.FoodInfo.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.Weight.HEALTH_DATA_TYPE, PermissionType.READ));
+        //mKeySet.add(new PermissionKey(HealthConstants.Weight.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BodyTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BloodPressure.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BloodGlucose.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.OxygenSaturation.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.HbA1c.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.Electrocardiogram.HEALTH_DATA_TYPE, PermissionType.READ));
+        //mKeySet.add(new PermissionKey(HealthConstants.Electrocardiogram.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.UvExposure.HEALTH_DATA_TYPE, PermissionType.READ));
     }
@@ -72,7 +72,7 @@ public class SHealthConnector {
             Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
             e.printStackTrace();
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Could not connect with SHealth");
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Could not successfully connect with SHealth");
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -92,7 +92,7 @@ public class SHealthConnector {
             Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
             Log.e(APP_TAG, "Permission setting fails.");
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Permission setting failed");
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Not successfully connected with SHealth");
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -104,7 +104,7 @@ public class SHealthConnector {
         } else {
             Log.e(APP_TAG, "mReporter == null");
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Not connected with SHealth");
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Not successfully connected with SHealth");
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -127,7 +127,6 @@ public class SHealthConnector {
                 Map<PermissionKey, Boolean> resultMap = pmsManager.isPermissionAcquired(mKeySet);
 
                 if (resultMap.containsValue(Boolean.FALSE)) {
-                    Log.e(APP_TAG, "try pmsManager.requestPermissions");
                     // Request the permission for reading step counts if it is not acquired
                     pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
                 } else {
@@ -143,7 +142,6 @@ public class SHealthConnector {
         @Override
         public void onConnectionFailed(HealthConnectionErrorResult error) {
             Log.d(APP_TAG, "Health data service is not available.");
-            //showConnectionFailureDialog(error);
         }
 
         @Override
@@ -161,7 +159,6 @@ public class SHealthConnector {
                     Map<PermissionKey, Boolean> resultMap = result.getResultMap();
 
                     if (resultMap.containsValue(Boolean.FALSE)) {
-                        //drawStepCount("");
                         //showPermissionAlarmDialog();
                     } else {
                         // Get the current step count and display it

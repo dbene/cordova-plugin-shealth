@@ -54,13 +54,11 @@ public class DataReporter {
     }
 
     public void start(long pStartTime, long pEndTime) {
-        // Register an observer to listen changes of step count and get today step count
-        // HealthDataObserver.addObserver(mStore, HealthConstants.StepCount.HEALTH_DATA_TYPE, mObserver);
-
         Log.d(APP_TAG,"Time: " + pStartTime + " - " + pEndTime);
 
-        long startTime = 1480546800000l;
-        long endTime = System.currentTimeMillis();
+        // Debug
+        long startTime = pStartTime; // 1480546800000l;
+        long endTime = pEndTime; // System.currentTimeMillis();
 
         // StepCount
         readHealthConstant(

@@ -49,7 +49,8 @@ Example of an api call in your `www/js/index.js`
 	}
 	
 	function apiGetData() {
-		shealth.getDataFromSHealth("1483455300000;1583455300000", success, failure);
+		// Unixtime in milliseconds, [<start_time>,<end_time>]
+		shealth.getDataFromSHealth([1484422968001,1489520568002], success, failure);
 	}
 ```
 

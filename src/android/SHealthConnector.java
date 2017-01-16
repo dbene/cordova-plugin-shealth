@@ -72,7 +72,7 @@ public class SHealthConnector {
             Log.e(APP_TAG, "healthDataService.initialize - " + e.toString());
             e.printStackTrace();
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Could not successfully connect with SHealth");
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "{\"TYPE\":\"ERROR\",\"MESSAGE\":\"Could not successfully connect with SHealth\"}");
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -92,7 +92,7 @@ public class SHealthConnector {
             Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
             Log.e(APP_TAG, "Permission setting fails.");
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Not successfully connected with SHealth");
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "{\"TYPE\":\"ERROR\",\"MESSAGE\":\"Not successfully connected with SHealth\"}");
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -104,7 +104,7 @@ public class SHealthConnector {
         } else {
             Log.e(APP_TAG, "mReporter == null");
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "Not successfully connected with SHealth");
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.ERROR, "{\"TYPE\":\"ERROR\",\"MESSAGE\":\"Not successfully connected with SHealth\"}");
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }

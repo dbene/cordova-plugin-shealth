@@ -31,6 +31,11 @@ import android.app.AlertDialog;
 import android.database.Cursor;
 import android.util.Log;
 
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonArrayBuilder;
+import javax.json.JsonObject;
+
 import org.apache.cordova.*;
 
 import android.app.Activity;
@@ -365,46 +370,38 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET;COUNT;DISTANCE;CALORIE;SPEED;SAMPLE_POSITION_TYPE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "StepCount").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.StepCount.START_TIME))).
+                                add("END_TIME", c.getLong(c.getColumnIndex(HealthConstants.StepCount.END_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.StepCount.TIME_OFFSET))).
+                                add("COUNT", c.getInt(c.getColumnIndex(HealthConstants.StepCount.COUNT))).
+                                add("DISTANCE", c.getFloat(c.getColumnIndex(HealthConstants.StepCount.DISTANCE))).
+                                add("CALORIE", c.getFloat(c.getColumnIndex(HealthConstants.StepCount.CALORIE))).
+                                add("SPEED", c.getFloat(c.getColumnIndex(HealthConstants.StepCount.SPEED))).
+                                add("SAMPLE_POSITION_TYPE", c.getInt(c.getColumnIndex(HealthConstants.StepCount.SAMPLE_POSITION_TYPE)))
+                        );
 
-                        sb.append("StepCount");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.END_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.COUNT)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.DISTANCE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.CALORIE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.StepCount.SPEED)));
-                        sb.append(";");
-                        sb.append(c.getInt(c.getColumnIndex(HealthConstants.StepCount.SAMPLE_POSITION_TYPE)));
-                        sb.append(System.getProperty("line.separator"));
                     }
                 }
+
             } finally {
                 if (c != null) {
                     c.close();
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -414,84 +411,46 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET;CALORIE;" +
-                        "DURATION;EXERCISE_TYPE;EXERCISE_CUSTOM_TYPE;DISTANCE;ALTITUDE_GAIN;" +
-                        "ALTITUDE_LOSS;COUNT;COUNT_TYPE;MAX_SPEED;MEAN_SPEED;" +
-                        "MAX_CALORICBURN_RATE;MEAN_CALORICBURN_RATE;MAX_CADENCE;MEAN_CADENCE;MAX_HEART_RATE" +
-                        "MEAN_HEART_RATE;MIN_HEART_RATE;MAX_ALTITUDE;MEAN_ALTITUDE;INCLINE_DISTANCE;DECLINE_DISTANCE;MAX_POWER" +
-                        "MEAN_POWER;MEAN_RPM;" + /*LIVE_DATA*/ "LOCATION_DATA");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-
-                        sb.append("Exercise");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.END_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.CALORIE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.DURATION)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.EXERCISE_TYPE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.EXERCISE_CUSTOM_TYPE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.DISTANCE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.ALTITUDE_GAIN)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.ALTITUDE_LOSS)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.COUNT)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.COUNT_TYPE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_SPEED)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MEAN_SPEED)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_CALORICBURN_RATE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MEAN_CALORICBURN_RATE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_CADENCE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_CADENCE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_HEART_RATE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MEAN_HEART_RATE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MIN_HEART_RATE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_ALTITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MIN_ALTITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.INCLINE_DISTANCE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.DECLINE_DISTANCE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MAX_POWER)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MEAN_POWER)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.MEAN_RPM)));
-                        sb.append(";");
-                        //sb.append(c.getString(c.getColumnIndex(HealthConstants.Exercise.LIVE_DATA)));
-                        //sb.append(";");
-                        sb.append(c.getInt(c.getColumnIndex(HealthConstants.Exercise.LOCATION_DATA)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "Sleep").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.Exercise.START_TIME))).
+                                add("END_TIME", c.getLong(c.getColumnIndex(HealthConstants.Exercise.END_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.Exercise.TIME_OFFSET))).
+                                add("CALORIE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.CALORIE))).
+                                add("DURATION", c.getLong(c.getColumnIndex(HealthConstants.Exercise.DURATION))).
+                                add("EXERCISE_TYPE", c.getInt(c.getColumnIndex(HealthConstants.Exercise.EXERCISE_TYPE))).
+                                add("EXERCISE_CUSTOM_TYPE", c.getInt(c.getColumnIndex(HealthConstants.Exercise.EXERCISE_CUSTOM_TYPE))).
+                                add("DISTANCE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.DISTANCE))).
+                                add("ALTITUDE_GAIN", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.ALTITUDE_GAIN))).
+                                add("ALTITUDE_LOSS", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.ALTITUDE_LOSS))).
+                                add("COUNT", c.getInt(c.getColumnIndex(HealthConstants.Exercise.COUNT))).
+                                add("COUNT_TYPE", c.getInt(c.getColumnIndex(HealthConstants.Exercise.COUNT_TYPE))).
+                                add("MAX_SPEED", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_SPEED))).
+                                add("MEAN_SPEED", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_SPEED))).
+                                add("MAX_CALORICBURN_RATE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_CALORICBURN_RATE))).
+                                add("MEAN_CALORICBURN_RATE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_CALORICBURN_RATE))).
+                                add("MAX_CADENCE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_CADENCE))).
+                                add("MEAN_CADENCE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_CADENCE))).
+                                add("MAX_HEART_RATE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_HEART_RATE))).
+                                add("MEAN_HEART_RATE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_HEART_RATE))).
+                                add("MIN_HEART_RATE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MIN_HEART_RATE))).
+                                add("MAX_ALTITUDE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_ALTITUDE))).
+                                add("MIN_ALTITUDE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MIN_ALTITUDE))).
+                                add("INCLINE_DISTANCE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.INCLINE_DISTANCE))).
+                                add("DECLINE_DISTANCE", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.DECLINE_DISTANCE))).
+                                add("MAX_POWER", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_POWER))).
+                                add("MEAN_POWER", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_POWER))).
+                                add("MEAN_RPM", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_RPM)))
+                                //.add("TIME_OFFSET", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.LIVE_DATA))).
+                                //add("TIME_OFFSET", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.LOCATION_DATA)))
+                        );
                     }
                 }
             } finally {
@@ -500,9 +459,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -512,24 +472,19 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("Sleep");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Sleep.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Sleep.END_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.Sleep.TIME_OFFSET)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "Sleep").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.Sleep.START_TIME))).
+                                add("END_TIME", c.getLong(c.getColumnIndex(HealthConstants.Sleep.END_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.Sleep.TIME_OFFSET)))
+                        );
                     }
                 }
             } finally {
@@ -538,9 +493,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -550,28 +506,21 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET;SLEEP_ID;STAGE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("SleepStage");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.SleepStage.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.SleepStage.END_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.SleepStage.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.SleepStage.SLEEP_ID)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.SleepStage.STAGE)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "Sleep").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.SleepStage.START_TIME))).
+                                add("END_TIME", c.getLong(c.getColumnIndex(HealthConstants.SleepStage.END_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.SleepStage.TIME_OFFSET))).
+                                add("SLEEP_ID", c.getString(c.getColumnIndex(HealthConstants.SleepStage.SLEEP_ID))).
+                                add("STAGE", c.getInt(c.getColumnIndex(HealthConstants.SleepStage.STAGE)))
+                        );
                     }
                 }
             } finally {
@@ -580,9 +529,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -592,34 +542,24 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;CALORIE;FOOD_INFO_ID;AMOUNT;UNIT;NAME;MEAL_TYPE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("FoodIntake");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.CALORIE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.FOOD_INFO_ID)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.AMOUNT)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.UNIT)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.NAME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.FoodIntake.MEAL_TYPE)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "FoodIntake").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.FoodIntake.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.FoodIntake.TIME_OFFSET))).
+                                add("CALORIE", c.getFloat(c.getColumnIndex(HealthConstants.FoodIntake.CALORIE))).
+                                add("FOOD_INFO_ID", c.getString(c.getColumnIndex(HealthConstants.FoodIntake.FOOD_INFO_ID))).
+                                add("AMOUNT", c.getFloat(c.getColumnIndex(HealthConstants.FoodIntake.AMOUNT))).
+                                add("UNIT", c.getString(c.getColumnIndex(HealthConstants.FoodIntake.UNIT))).
+                                add("NAME", c.getString(c.getColumnIndex(HealthConstants.FoodIntake.NAME))).
+                                add("MEAL_TYPE", c.getInt(c.getColumnIndex(HealthConstants.FoodIntake.MEAL_TYPE)))
+                        );
                     }
                 }
             } finally {
@@ -628,9 +568,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -640,26 +581,20 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;AMOUNT;UNIT_AMOUNT");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("WaterIntake");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.WaterIntake.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.WaterIntake.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.WaterIntake.AMOUNT)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.WaterIntake.UNIT_AMOUNT)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "WaterIntake").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.WaterIntake.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.WaterIntake.TIME_OFFSET))).
+                                add("AMOUNT", c.getFloat(c.getColumnIndex(HealthConstants.WaterIntake.AMOUNT))).
+                                add("UNIT_AMOUNT", c.getFloat(c.getColumnIndex(HealthConstants.WaterIntake.UNIT_AMOUNT)))
+                        );
                     }
                 }
             } finally {
@@ -668,9 +603,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -680,26 +616,20 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;AMOUNT;UNIT_AMOUNT");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("CaffeineIntake");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.CaffeineIntake.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.CaffeineIntake.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.CaffeineIntake.AMOUNT)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.CaffeineIntake.UNIT_AMOUNT)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "CaffeineIntake").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.CaffeineIntake.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.CaffeineIntake.TIME_OFFSET))).
+                                add("AMOUNT", c.getFloat(c.getColumnIndex(HealthConstants.CaffeineIntake.AMOUNT))).
+                                add("UNIT_AMOUNT", c.getString(c.getColumnIndex(HealthConstants.CaffeineIntake.UNIT_AMOUNT)))
+                        );
                     }
                 }
             } finally {
@@ -708,9 +638,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -720,28 +651,21 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET;HEART_RATE;HEART_BEAT_COUNT");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("HeartRate");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HeartRate.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HeartRate.END_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HeartRate.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HeartRate.HEART_RATE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HeartRate.HEART_BEAT_COUNT)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "HeartRate").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.HeartRate.START_TIME))).
+                                add("END_TIME", c.getLong(c.getColumnIndex(HealthConstants.HeartRate.END_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.HeartRate.TIME_OFFSET))).
+                                add("HEART_RATE", c.getFloat(c.getColumnIndex(HealthConstants.HeartRate.HEART_RATE))).
+                                add("HEART_BEAT_COUNT", c.getInt(c.getColumnIndex(HealthConstants.HeartRate.HEART_BEAT_COUNT)))
+                        );
                     }
                 }
             } finally {
@@ -750,9 +674,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -762,24 +687,19 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;TEMPERATURE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("BodyTemperature");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BodyTemperature.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BodyTemperature.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BodyTemperature.TEMPERATURE)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "BodyTemperature").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.BodyTemperature.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.BodyTemperature.TIME_OFFSET))).
+                                add("TEMPERATURE", c.getFloat(c.getColumnIndex(HealthConstants.BodyTemperature.TEMPERATURE)))
+                        );
                     }
                 }
             } finally {
@@ -788,9 +708,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -800,30 +721,22 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;SYSTOLIC;DIASTOLIC;MEAN;PULSE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("BloodPressure");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodPressure.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodPressure.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodPressure.SYSTOLIC)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodPressure.DIASTOLIC)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodPressure.MEAN)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodPressure.PULSE)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "BloodPressure").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.BloodPressure.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.BloodPressure.TIME_OFFSET))).
+                                add("SYSTOLIC", c.getFloat(c.getColumnIndex(HealthConstants.BloodPressure.SYSTOLIC))).
+                                add("DIASTOLIC", c.getFloat(c.getColumnIndex(HealthConstants.BloodPressure.DIASTOLIC))).
+                                add("MEAN", c.getFloat(c.getColumnIndex(HealthConstants.BloodPressure.MEAN))).
+                                add("PULSE", c.getInt(c.getColumnIndex(HealthConstants.BloodPressure.PULSE)))
+                        );
                     }
                 }
             } finally {
@@ -832,9 +745,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -844,32 +758,23 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;GLUCOSE;MEAL_TIME;MEAL_TYPE;MEASUREMENT_TYPE;SAMPLE_SOURCE_TYPE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("BloodGlucose");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.GLUCOSE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.MEAL_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.MEAL_TYPE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.MEASUREMENT_TYPE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.BloodGlucose.SAMPLE_SOURCE_TYPE)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "BloodGlucose").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.BloodGlucose.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.BloodGlucose.TIME_OFFSET))).
+                                add("GLUCOSE", c.getFloat(c.getColumnIndex(HealthConstants.BloodGlucose.GLUCOSE))).
+                                add("MEAL_TIME", c.getLong(c.getColumnIndex(HealthConstants.BloodGlucose.MEAL_TIME))).
+                                add("MEAL_TYPE", c.getInt(c.getColumnIndex(HealthConstants.BloodGlucose.MEAL_TYPE))).
+                                add("MEASUREMENT_TYPE", c.getInt(c.getColumnIndex(HealthConstants.BloodGlucose.MEASUREMENT_TYPE))).
+                                add("SAMPLE_SOURCE_TYPE", c.getInt(c.getColumnIndex(HealthConstants.BloodGlucose.SAMPLE_SOURCE_TYPE)))
+                        );
                     }
                 }
             } finally {
@@ -878,9 +783,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -890,28 +796,21 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;END_TIME;TIME_OFFSET;SPO2;HEART_RATE");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("OxygenSaturation");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.OxygenSaturation.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.OxygenSaturation.END_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.OxygenSaturation.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.OxygenSaturation.SPO2)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.OxygenSaturation.HEART_RATE)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "OxygenSaturation").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.OxygenSaturation.START_TIME))).
+                                add("END_TIME", c.getLong(c.getColumnIndex(HealthConstants.OxygenSaturation.END_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.OxygenSaturation.TIME_OFFSET))).
+                                add("SPO2", c.getFloat(c.getColumnIndex(HealthConstants.OxygenSaturation.SPO2))).
+                                add("HEART_RATE", c.getFloat(c.getColumnIndex(HealthConstants.OxygenSaturation.HEART_RATE)))
+                        );
                     }
                 }
             } finally {
@@ -920,9 +819,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -932,24 +832,19 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;HBA1C");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("HbA1c");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HbA1c.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HbA1c.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.HbA1c.HBA1C)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "HbA1c").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.HbA1c.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.HbA1c.TIME_OFFSET))).
+                                add("HBA1C", c.getFloat(c.getColumnIndex(HealthConstants.HbA1c.HBA1C)))
+                        );
                     }
                 }
             } finally {
@@ -958,9 +853,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -970,34 +866,24 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;TEMPERATURE;HUMIDITY;LATITUDE;LONGITUDE;ALTITUDE;ACCURACY");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("AmbientTemperature");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.TEMPERATURE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.HUMIDITY)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.LATITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.LONGITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.ALTITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.AmbientTemperature.ACCURACY)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "AmbientTemperature").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.AmbientTemperature.TIME_OFFSET))).
+                                add("TEMPERATURE", c.getFloat(c.getColumnIndex(HealthConstants.AmbientTemperature.TEMPERATURE))).
+                                add("HUMIDITY", c.getFloat(c.getColumnIndex(HealthConstants.AmbientTemperature.HUMIDITY))).
+                                add("LATITUDE", c.getFloat(c.getColumnIndex(HealthConstants.AmbientTemperature.LATITUDE))).
+                                add("LONGITUDE", c.getFloat(c.getColumnIndex(HealthConstants.AmbientTemperature.LONGITUDE))).
+                                add("ALTITUDE", c.getFloat(c.getColumnIndex(HealthConstants.AmbientTemperature.ALTITUDE))).
+                                add("ACCURACY", c.getFloat(c.getColumnIndex(HealthConstants.AmbientTemperature.ACCURACY)))
+                        );
                     }
                 }
             } finally {
@@ -1006,9 +892,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }
@@ -1018,32 +905,23 @@ public class DataReporter {
         @Override
         public void onResult(ReadResult result) {
             Cursor c = null;
-            StringBuilder sb = new StringBuilder();
+            JsonArrayBuilder array = Json.createArrayBuilder();
 
             try {
                 c = result.getResultCursor();
 
-                sb.append("NAME;START_TIME;TIME_OFFSET;UV_INDEX;LATITUDE;LONGITUDE;ALTITUDE;ACCURACY");
-                sb.append(System.getProperty("line.separator"));
-
                 if (c != null) {
                     while (c.moveToNext()) {
-                        sb.append("UvExposure");
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.START_TIME)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.TIME_OFFSET)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.UV_INDEX)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.LATITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.LONGITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.ALTITUDE)));
-                        sb.append(";");
-                        sb.append(c.getString(c.getColumnIndex(HealthConstants.UvExposure.ACCURACY)));
-                        sb.append(System.getProperty("line.separator"));
+                        array.add(Json.createObjectBuilder().
+                                add("TYPE", "UvExposure").
+                                add("START_TIME", c.getLong(c.getColumnIndex(HealthConstants.UvExposure.START_TIME))).
+                                add("TIME_OFFSET", c.getLong(c.getColumnIndex(HealthConstants.UvExposure.TIME_OFFSET))).
+                                add("UV_INDEX", c.getFloat(c.getColumnIndex(HealthConstants.UvExposure.UV_INDEX))).
+                                add("LATITUDE", c.getFloat(c.getColumnIndex(HealthConstants.UvExposure.LATITUDE))).
+                                add("LONGITUDE", c.getFloat(c.getColumnIndex(HealthConstants.UvExposure.LONGITUDE))).
+                                add("ALTITUDE", c.getFloat(c.getColumnIndex(HealthConstants.UvExposure.ALTITUDE))).
+                                add("ACCURACY", c.getFloat(c.getColumnIndex(HealthConstants.UvExposure.ACCURACY)))
+                        );
                     }
                 }
             } finally {
@@ -1052,9 +930,10 @@ public class DataReporter {
                 }
             }
 
-            Log.d(APP_TAG,sb.toString());
+            JsonArray jsonarr = array.build();
+            Log.d(APP_TAG, jsonarr.toString());
 
-            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, sb.toString());
+            PluginResult pluginResult = new PluginResult(PluginResult.Status.OK, jsonarr.toString());
             pluginResult.setKeepCallback(true);
             callbackContext.sendPluginResult(pluginResult);
         }

@@ -17,6 +17,14 @@ public class SHealth extends CordovaPlugin {
     Activity activity = null;
     SHealthConnector connector = null;
 
+    /** The function detects the called function
+     *
+     * @param action          The action to execute.
+     * @param data            Function parameter as JSON array.
+     * @param callbackContext The callback context used when calling back into JavaScript.
+     * @return
+     * @throws JSONException
+     */
     @Override
     public boolean execute(String action, JSONArray data, CallbackContext callbackContext) throws JSONException {
 

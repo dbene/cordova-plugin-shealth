@@ -50,25 +50,30 @@ public class DataReporter {
 
     String APP_TAG = "CordovaSHealthPlugin";
 
-    String resultString = "result: ";
-
+    /** Default Constructor.
+     *
+     * @param store             The connected {@link HealthDataStore}
+     * @param pActivity         Activity of the cordova application
+     * @param pCallbackContext  Object holding callback functions
+     */
     public DataReporter(HealthDataStore store, Activity pActivity, CallbackContext pCallbackContext) {
         mStore = store;
         activity = pActivity;
         this.callbackContext = pCallbackContext;
     }
 
+    /** Initiates the database query
+     *
+     * @param pStartTime    Earliest time of measurement
+     * @param pEndTime      Latest time of measurement
+     */
     public void start(long pStartTime, long pEndTime) {
         Log.d(APP_TAG,"Time: " + pStartTime + " - " + pEndTime);
 
-        // Debug
-        long startTime = pStartTime; // 1480546800000l;
-        long endTime = pEndTime; // System.currentTimeMillis();
-
         // StepCount
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.StepCount.START_TIME,
                 HealthConstants.StepCount.HEALTH_DATA_TYPE,
                 new String[] {
@@ -86,8 +91,8 @@ public class DataReporter {
 
         // Exercise
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.Exercise.START_TIME,
                 HealthConstants.Exercise.HEALTH_DATA_TYPE,
                 new String[] {
@@ -119,7 +124,6 @@ public class DataReporter {
                         HealthConstants.Exercise.MAX_POWER,
                         HealthConstants.Exercise.MEAN_POWER,
                         HealthConstants.Exercise.MEAN_RPM,
-                        //HealthConstants.Exercise.LIVE_DATA,
                         HealthConstants.Exercise.LOCATION_DATA
                 },
                 mListenerExercise
@@ -127,8 +131,8 @@ public class DataReporter {
 
         // Sleep
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.Sleep.START_TIME,
                 HealthConstants.Sleep.HEALTH_DATA_TYPE,
                 new String[] {
@@ -141,8 +145,8 @@ public class DataReporter {
 
         // SleepStage
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.SleepStage.START_TIME,
                 HealthConstants.SleepStage.HEALTH_DATA_TYPE,
                 new String[] {
@@ -155,11 +159,9 @@ public class DataReporter {
                 mListenerSleepStage
         );
 
-        // ToDo FoodInfo
-
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.FoodIntake.START_TIME,
                 HealthConstants.FoodIntake.HEALTH_DATA_TYPE,
                 new String[] {
@@ -176,8 +178,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.WaterIntake.START_TIME,
                 HealthConstants.WaterIntake.HEALTH_DATA_TYPE,
                 new String[] {
@@ -190,8 +192,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.CaffeineIntake.START_TIME,
                 HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE,
                 new String[] {
@@ -203,11 +205,9 @@ public class DataReporter {
                 mListenerCaffeineIntake
         );
 
-        // ToDo Weight
-
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.HeartRate.START_TIME,
                 HealthConstants.HeartRate.HEALTH_DATA_TYPE,
                 new String[] {
@@ -221,8 +221,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.BodyTemperature.START_TIME,
                 HealthConstants.BodyTemperature.HEALTH_DATA_TYPE,
                 new String[] {
@@ -235,8 +235,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.BloodPressure.START_TIME,
                 HealthConstants.BloodPressure.HEALTH_DATA_TYPE,
                 new String[] {
@@ -251,8 +251,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.BloodGlucose.START_TIME,
                 HealthConstants.BloodGlucose.HEALTH_DATA_TYPE,
                 new String[] {
@@ -268,8 +268,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.OxygenSaturation.START_TIME,
                 HealthConstants.OxygenSaturation.HEALTH_DATA_TYPE,
                 new String[] {
@@ -283,8 +283,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.HbA1c.START_TIME,
                 HealthConstants.HbA1c.HEALTH_DATA_TYPE,
                 new String[] {
@@ -295,11 +295,9 @@ public class DataReporter {
                 mListenerHbA1c
         );
 
-        // ToDo Electrocardiogram
-
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.AmbientTemperature.START_TIME,
                 HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE,
                 new String[] {
@@ -316,8 +314,8 @@ public class DataReporter {
         );
 
         readHealthConstant(
-                startTime,
-                endTime,
+                pStartTime,
+                pEndTime,
                 HealthConstants.UvExposure.START_TIME,
                 HealthConstants.UvExposure.HEALTH_DATA_TYPE,
                 new String[] {
@@ -333,6 +331,15 @@ public class DataReporter {
         );
     }
 
+    /** Starts the database query for a specific {@link HealthConstants}
+     *
+     * @param pStatTime     Earliest time of measurement
+     * @param pEndTime      Latest time of measurement
+     * @param hcStartTime   Enum for start time
+     * @param hcHDT
+     * @param hcString      Array of requestet attributes
+     * @param pmListener    Callback function for results
+     */
     private void readHealthConstant(long pStatTime, long pEndTime, String hcStartTime, String hcHDT, String[] hcString, HealthResultHolder.ResultListener<ReadResult> pmListener) {
         HealthDataResolver resolver = new HealthDataResolver(mStore, null);
 
@@ -352,20 +359,9 @@ public class DataReporter {
         }
     }
 
-    private long getStartTimeOfToday() {
-        Calendar today = Calendar.getInstance();
-
-        today.set(Calendar.HOUR_OF_DAY, 0);
-        today.set(Calendar.MINUTE, 0);
-        today.set(Calendar.SECOND, 0);
-        today.set(Calendar.MILLISECOND, 0);
-
-        // Letzer Monat
-        today.add(Calendar.DAY_OF_MONTH, -8);
-
-        return today.getTimeInMillis();
-    }
-
+    /** Callback for  {@link HealthConstants.StepCount}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerStepCount = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -407,6 +403,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.Exercise}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerExercise = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -448,8 +447,6 @@ public class DataReporter {
                                 add("MAX_POWER", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MAX_POWER))).
                                 add("MEAN_POWER", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_POWER))).
                                 add("MEAN_RPM", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.MEAN_RPM)))
-                                //.add("TIME_OFFSET", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.LIVE_DATA))).
-                                //add("TIME_OFFSET", c.getFloat(c.getColumnIndex(HealthConstants.Exercise.LOCATION_DATA)))
                         );
                     }
                 }
@@ -468,6 +465,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.Sleep}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerSleep = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -502,6 +502,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.SleepStage}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerSleepStage = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -538,6 +541,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.FoodIntake}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerFoodIntake = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -577,6 +583,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.WaterIntake}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerWaterIntake = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -612,6 +621,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.CaffeineIntake}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerCaffeineIntake = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -647,6 +659,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.HeartRate}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerHeartRate = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -683,6 +698,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.BodyTemperature}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerBodyTemperature = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -717,6 +735,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.BloodPressure}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerBloodPressure = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -754,6 +775,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.BloodGlucose}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerBloodGlucose = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -792,6 +816,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.OxygenSaturation}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerOxygenSaturation = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -828,6 +855,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.HbA1c}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerHbA1c = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -862,6 +892,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.AmbientTemperature}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerAmbientTemperature = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {
@@ -901,6 +934,9 @@ public class DataReporter {
         }
     };
 
+    /** Callback for  {@link HealthConstants.UvExposure}
+     *
+     */
     private final HealthResultHolder.ResultListener<ReadResult> mListenerUvExposure = new HealthResultHolder.ResultListener<ReadResult>() {
         @Override
         public void onResult(ReadResult result) {

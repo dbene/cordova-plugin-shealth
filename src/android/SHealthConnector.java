@@ -26,10 +26,7 @@ import android.app.Activity;
 
 public class SHealthConnector {
 
-    private final int MENU_ITEM_PERMISSION_SETTING = 1;
-
     private HealthDataStore mStore;
-    private HealthConnectionErrorResult mConnError;
     private Set<PermissionKey> mKeySet;
     private DataReporter mReporter;
 
@@ -38,6 +35,11 @@ public class SHealthConnector {
     Activity activity;
     CallbackContext callbackContext;
 
+    /** Default Constructor.
+     *
+     * @param pActivity         Activity of the cordova application
+     * @param pCallbackContext  Object holding callback functions
+     */
     public SHealthConnector(Activity pActivity, CallbackContext pCallbackContext){
         this.activity = pActivity;
         this.callbackContext = pCallbackContext;
@@ -46,23 +48,23 @@ public class SHealthConnector {
         mKeySet.add(new PermissionKey(HealthConstants.StepCount.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.Exercise.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.Sleep.HEALTH_DATA_TYPE, PermissionType.READ));
-        mKeySet.add(new PermissionKey(HealthConstants.SleepStage.HEALTH_DATA_TYPE, PermissionType.READ)); // Not in Manifest
-        //mKeySet.add(new PermissionKey(HealthConstants.FoodInfo.HEALTH_DATA_TYPE, PermissionType.READ));
+        mKeySet.add(new PermissionKey(HealthConstants.SleepStage.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.FoodIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.WaterIntake.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.CaffeineIntake.HEALTH_DATA_TYPE, PermissionType.READ));
-        //mKeySet.add(new PermissionKey(HealthConstants.Weight.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.HeartRate.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BodyTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BloodPressure.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.BloodGlucose.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.OxygenSaturation.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.HbA1c.HEALTH_DATA_TYPE, PermissionType.READ));
-        //mKeySet.add(new PermissionKey(HealthConstants.Electrocardiogram.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.AmbientTemperature.HEALTH_DATA_TYPE, PermissionType.READ));
         mKeySet.add(new PermissionKey(HealthConstants.UvExposure.HEALTH_DATA_TYPE, PermissionType.READ));
     }
 
+    /** Connects the plugin to S Health
+     *
+     */
     public void connect() {
 
         HealthDataService healthDataService = new HealthDataService();
@@ -83,11 +85,14 @@ public class SHealthConnector {
         mStore.connectService();
     }
 
+    /** Opens the permission manager for S Health
+     *
+     */
     public void callHealthPermissionManager() {
         HealthPermissionManager pmsManager = new HealthPermissionManager(mStore);
         try {
             // Show user permission UI for allowing user to change options
-            pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
+            pmsManager.requestPermissions(mKeySet, activity);
         } catch (Exception e) {
             Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
             Log.e(APP_TAG, "Permission setting fails.");
@@ -98,6 +103,11 @@ public class SHealthConnector {
         }
     }
 
+    /** Starts the database query for S Health
+     *
+     * @param startTime     Earliest time of measurement
+     * @param endTime      Latest time of measurement
+     */
     public void startReporter(long startTime, long endTime) {
         if(mReporter != null){
             mReporter.start(startTime,endTime);
@@ -110,10 +120,9 @@ public class SHealthConnector {
         }
     }
 
-    public void disconnectService() {
-        mStore.disconnectService();
-    }
-
+    /** Callback object for {@link HealthDataStore}
+     *
+     */
     private final HealthDataStore.ConnectionListener mConnectionListener = new HealthDataStore.ConnectionListener() {
 
         @Override
@@ -128,10 +137,7 @@ public class SHealthConnector {
 
                 if (resultMap.containsValue(Boolean.FALSE)) {
                     // Request the permission for reading step counts if it is not acquired
-                    pmsManager.requestPermissions(mKeySet, activity).setResultListener(mPermissionListener);
-                } else {
-                    // Get the current step count and display it
-                    // mReporter.start();
+                    pmsManager.requestPermissions(mKeySet, activity);
                 }
             } catch (Exception e) {
                 Log.e(APP_TAG, e.getClass().getName() + " - " + e.getMessage());
@@ -150,26 +156,12 @@ public class SHealthConnector {
         }
     };
 
-    private final HealthResultHolder.ResultListener<PermissionResult> mPermissionListener =
-            new HealthResultHolder.ResultListener<PermissionResult>() {
-
-                @Override
-                public void onResult(PermissionResult result) {
-                    Log.d(APP_TAG, "Permission callback is received.");
-                    Map<PermissionKey, Boolean> resultMap = result.getResultMap();
-
-                    if (resultMap.containsValue(Boolean.FALSE)) {
-                        //showPermissionAlarmDialog();
-                    } else {
-                        // Get the current step count and display it
-                        // mReporter.start();
-                    }
-                }
-            };
-
-
+    /**  Returns the name of the class
+     *
+     * @return Name of class
+     */
     @Override
     public String toString() {
-        return "Test von SHealthConnector";
+        return "SHealthConnector";
     }
 }
